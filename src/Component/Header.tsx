@@ -1,13 +1,33 @@
 "use client";
-import { Menu, Group, Center, Burger, Container } from "@mantine/core";
+import { Menu, Group, Center, Burger, Container, Flex } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconChevronDown, IconCar } from "@tabler/icons-react";
+import { IconChevronDown, IconLogin2 } from "@tabler/icons-react";
 import classes from "./Header.module.css";
 import Image from "next/image";
 import Link from "next/link";
+import { ReactNode } from "react";
 
-type Links = { link: string; label: string; links?: Links[] };
-const links: Links[] = [{ link: "/carros", label: "Carros" }];
+type Links = { link: string; label: ReactNode; links?: Links[] };
+const links: Links[] = [
+  { link: "/carros", label: "Carros" },
+  {
+    link: "/login",
+    label: (
+      <Flex align={"center"} c={"gray.6"}>
+        <IconLogin2 />
+        Entrar
+      </Flex>
+    ),
+  },
+  {
+    link: "/register",
+    label: (
+      <Flex align={"center"} c={"red.6"}>
+        Registrar
+      </Flex>
+    ),
+  },
+];
 
 export function HeaderMenu() {
   const [opened, { toggle }] = useDisclosure(false);
@@ -20,7 +40,7 @@ export function HeaderMenu() {
     if (menuItems) {
       return (
         <Menu
-          key={link.label}
+          key={link.link}
           trigger="hover"
           transitionProps={{ exitDuration: 0 }}
           withinPortal
@@ -43,7 +63,7 @@ export function HeaderMenu() {
     }
 
     return (
-      <Link key={link.label} href={link.link} className={classes.link}>
+      <Link key={link.link} href={link.link} className={classes.link}>
         {link.label}
       </Link>
     );
