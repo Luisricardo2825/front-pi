@@ -1,10 +1,8 @@
-import { Button, Checkbox, Flex, Text, TextInput } from "@mantine/core";
+import { Button, Center, Checkbox, Flex, Text, TextInput } from "@mantine/core";
 import React from "react";
-
-import ILoginForm from "./Types/ILoginForm";
-
-import validationSchema from "./Schemas/Validation";
 import Link from "@/Component/Link";
+
+import classes from "./Login.module.css";
 
 export default function LoginForm() {
   const FieldWidth = "20vw";
@@ -20,57 +18,100 @@ export default function LoginForm() {
   };
 
   return (
-    <Flex align={"center"} justify={"center"} direction={"column"}>
-      <TextInput
-        id="username"
-        name="username"
-        type="text"
-        placeholder="Username"
-        variant="filled"
-        w={FieldWidth}
-        h="50px"
-        mt={"md"}
-      />
-      <TextInput
-        id="password"
-        name="password"
-        type="password"
-        placeholder="Senha"
-        label="Sua senha"
-        variant="filled"
-        w={FieldWidth}
-        h="50px"
-        mt={"md"}
-      />
-      <Flex direction={"row"} justify={"space-between"} w={"80%"} mt={"xl"} c={"gray.5"}>
-        <Checkbox
-          id="remeberMe"
-          label="Lembrar-me"
-          name="remeberMe"
-          type="checkbox"
-          fz={"sm"}
-        />
-        <Link href="/" c="red.400" fz={"sm"}>
-          Recuperar senha
+    <Flex
+      w={"30vw"}
+      direction="column"
+      style={{
+        borderRadius: "10px",
+      }}
+      bg={"white"}
+      justify={"center"}
+      align={"center"}
+      p={20}
+    >
+      <Center>
+        <Link fz={"3rem"} className={classes.link} href="/" w={"fit-content"}>
+          Login
         </Link>
-      </Flex>
-      <Button
-        mt={"md"}
-        color="red"
-        ml={"0"}
-        type="submit"
-        w={"10vw"}
-        style={{ borderRadius: "100px" }}
-      >
-        Submit
-      </Button>
-      <Text size={"sm"} c={"#707070"} mt={"lg"}>
-        Não possui uma conta?{" "}
-        <Link href="/register" c="red.6">
-          registre-se
-        </Link>{" "}
-        hoje!
-      </Text>
+      </Center>
+      <Center w={"100%"}>
+        <Flex
+          align={"center"}
+          justify={"center"}
+          direction={"column"}
+          w={"100%"}
+          h={"50vh"}
+        >
+          <TextInput
+            id="username"
+            name="username"
+            type="text"
+            placeholder="Usuário"
+            variant="filled"
+            w={FieldWidth}
+            h="50px"
+            mt={"md"}
+          />
+          <TextInput
+            id="password"
+            name="password"
+            type="password"
+            placeholder="Senha"
+            variant="filled"
+            w={FieldWidth}
+            h="50px"
+            mt={"md"}
+          />
+          <Flex
+            direction={"row"}
+            justify={"space-between"}
+            w={"60%"}
+            align={"center"}
+            mt={"sm"}
+            c={"gray.5"}
+          >
+            <Checkbox
+              id="remeberMe"
+              label="Lembrar-me"
+              name="remeberMe"
+              type="checkbox"
+              size="xs"
+            />
+            <Link href="/" c="red.400" fz={".8rem"}>
+              Recuperar senha
+            </Link>
+          </Flex>
+          <Button
+            mt={"md"}
+            color="red"
+            ml={"0"}
+            type="submit"
+            w={"10vw"}
+            style={{ borderRadius: "100px" }}
+            loading={isSubmitting}
+            onClick={handleSubmit}
+          >
+            Submit
+          </Button>
+          <Flex
+            fz={"xs"}
+            c={"#707070"}
+            mt={"lg"}
+            w={"100%"}
+            justify={"center"}
+            align={"center"}
+            direction={"column"}
+            lh={"15pt"}
+          >
+            Não possui uma conta?
+            <Flex>
+              <Link href={"/register"} c="red.6" fz={"xs"}>
+                registre-se.
+              </Link>
+            </Flex>
+          </Flex>
+        </Flex>
+      </Center>
     </Flex>
   );
 }

@@ -1,117 +1,96 @@
-import { Button, Flex, Text, TextInput } from "@mantine/core";
+import { Button, Center, Flex, Text, TextInput } from "@mantine/core";
 import React from "react";
 
 import Link from "@/Component/Link";
 
-interface IProps {
-  onClick: () => void;
-}
-const RegisterForm: React.FC<IProps> = (props) => {
+import classes from "./Register.module.css";
+
+const RegisterForm: React.FC = () => {
   const TextInputWidth = "25vw";
 
   return (
     <Flex
-      align={"center"}
-      mih={"60vh"}
-      direction={"column"}
-      w={"150%"}
-      ml="-20%"
-      h={"80vh"}
+      w={"30vw"}
+      direction="column"
       style={{
         borderRadius: "10px",
       }}
       bg={"white"}
       justify={"center"}
+      align={"center"}
+      p={10}
     >
-      <Flex justify={"right"} align={"center"} direction={"column"}>
-        <Link href="/">
-          <Text size="3rem" fw="bold">
-            Register
-          </Text>
+      <Center>
+        <Link fz={"3rem"} className={classes.link} href="/" w={"fit-content"}>
+          Registrar
         </Link>
-
-        <TextInput
-          id="name"
-          name="name"
-          type="text"
-          placeholder="Nome"
-          label="Nome"
-          withAsterisk
-          variant="filled"
-          w={TextInputWidth}
-          height="50px"
-          mt={"md"}
-        />
-
-        <TextInput
-          id="password"
-          name="password"
-          type="password"
-          placeholder="Senha"
-          label="Sua senha"
-          withAsterisk
-          variant="filled"
-          w={TextInputWidth}
-          height="50px"
-          mt={"md"}
-        />
-        <TextInput
-          id="confirmPassword"
-          name="confirmPassword"
-          type="password"
-          placeholder="Senha"
-          label="Confirme a senha"
-          withAsterisk
-          variant="filled"
-          w={TextInputWidth}
-          height="50px"
-          mt={"md"}
-        />
-
-        <TextInput
-          id="birthDate"
-          label="Data de nascimento"
-          name="birthDate"
-          withAsterisk
-          placeholder="Birth date"
-          type="date"
-          variant="filled"
-          w={TextInputWidth}
-          height="50px"
-          mt={"md"}
-        />
-
+      </Center>
+      <TextInput
+        id="name"
+        name="name"
+        type="text"
+        placeholder="Nome"
+        label="Nome"
+        withAsterisk
+        variant="filled"
+        w={TextInputWidth}
+        height="50px"
+        mt={"md"}
+      />
+      <TextInput
+        id="password"
+        name="password"
+        type="password"
+        placeholder="Senha"
+        label="Sua senha"
+        withAsterisk
+        variant="filled"
+        w={TextInputWidth}
+        height="50px"
+        mt={"md"}
+      />
+      <TextInput
+        id="birthDate"
+        label="Data de nascimento"
+        name="birthDate"
+        withAsterisk
+        placeholder="Data nascimento"
+        type="date"
+        variant="filled"
+        w={TextInputWidth}
+        height="50px"
+        mt={"md"}
+      />
+      <Flex
+        justify={"center"}
+        align={"center"}
+        direction={"column"}
+        m={10}
+        mt={"md"}
+      >
         <Flex
+          w={"100%"}
           justify={"center"}
           align={"center"}
           direction={"column"}
-          m={10}
-          mt={"md"}
+          mb={"sm"}
         >
-          <Flex
-            w={"100%"}
-            justify={"center"}
-            align={"center"}
-            direction={"column"}
-            mb={"sm"}
-          >
-            <Text size={"sm"} c={"#afafaf"}>
-              Já possui uma conta?{" "}
-              <Text c={"red"} onClick={props.onClick}>
-                Entrar
-              </Text>
-            </Text>
-          </Flex>
-          <Button
-            color="red"
-            ml={"auto"}
-            type="submit"
-            w={"100%"}
-            style={{ borderRadius: 100 }}
-          >
-            Register
-          </Button>
+          <Text size={"sm"} c={"#afafaf"} fz={"xs"} mt={"md"} p={2}>
+            Já possui uma conta?{" "}
+            <Link c={"red"} href="/login" fz={"xs"}>
+              Entrar
+            </Link>
+          </Text>
         </Flex>
+        <Button
+          color="red"
+          ml={"auto"}
+          type="submit"
+          w={"100%"}
+          style={{ borderRadius: 100 }}
+        >
+          Register
+        </Button>
       </Flex>
     </Flex>
   );

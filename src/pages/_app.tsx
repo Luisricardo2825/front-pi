@@ -1,5 +1,6 @@
 import "@mantine/core/styles.css";
 
+import { AnimatePresence } from "framer-motion";
 import { MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 import type { AppProps } from "next/app";
@@ -12,7 +13,7 @@ const font = Roboto_Mono({
   subsets: ["latin"],
 });
 
-export default function App({ Component, pageProps }: AppProps) {
+export default function App({ Component, pageProps, router }: AppProps) {
   const Router = useRouter();
   const isNavbarVisible = Check(Router.pathname, "navbar");
   // const isFooterVisible = Check(Router.pathname, "footer");
@@ -20,9 +21,9 @@ export default function App({ Component, pageProps }: AppProps) {
     <MantineProvider>
       {isNavbarVisible ? <HeaderMenu /> : null}
       <Notifications />
-      <div className={font.className}>
-        <Component {...pageProps} />
-      </div>
+      <AnimatePresence mode="wait" initial={false}>
+        <Component {...pageProps} key={router.asPath} />
+      </AnimatePresence>
     </MantineProvider>
   );
 }
