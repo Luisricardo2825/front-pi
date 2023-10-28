@@ -20,7 +20,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
   return (
     <MantineProvider>
       {isNavbarVisible ? <HeaderMenu /> : null}
-      <Notifications />
+      <Notifications position="top-right" zIndex={1000} />
       <AnimatePresence mode="wait" initial={false}>
         <Component {...pageProps} key={router.asPath} />
       </AnimatePresence>
