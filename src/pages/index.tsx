@@ -1,3 +1,5 @@
+import { Button } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import Head from "next/head";
 
 export default function Home() {
@@ -9,6 +11,9 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <Button onClick={() => notifications.show({ message: "Teste" })}>
+        Notification
+      </Button>
     </>
   );
 }

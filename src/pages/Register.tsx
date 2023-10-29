@@ -10,7 +10,6 @@ const Register: React.FC = () => {
       <Head>
         <title>Registrar</title>
       </Head>
-
       <RegisterForm />
     </Flex>
   );

@@ -4,6 +4,7 @@ import {
   Checkbox,
   Flex,
   Paper,
+  PasswordInput,
   Text,
   TextInput,
 } from "@mantine/core";
@@ -13,8 +14,17 @@ import Link from "@/Component/Link";
 import classes from "./Login.module.css";
 import { notifications } from "@mantine/notifications";
 import Layout from "../Layout";
+import { useForm } from "@mantine/form";
 
-export default function LoginForm() {
+interface Formvalues {
+  login: string;
+  senha: string;
+  lembrarMe: boolean;
+}
+interface ILoginProps {
+  onSubmit?: (values: Formvalues) => boolean | Promise<boolean>;
+}
+export default function LoginForm(props: ILoginProps) {
   const FieldWidth = "20vw";
   const [isSubmitting, setSubmitting] = React.useState(false);
 
@@ -26,18 +36,18 @@ export default function LoginForm() {
         exit: { rotateY: 90, transition: { duration: 0.3, ease: "linear" } },
       }
     : undefined;
-  const handleSubmit = async (values: any) => {
-    setSubmitting(true);
-    await setTimeout(() => {
-      /* Do something */
-      notifications.show({
-        title: "Logado com sucesso",
-        message: "Bem vindo, Ricardo",
-        color: "green",
-      });
-      setSubmitting(false);
-    }, 1000);
-  };
+
+  const form = useForm({
+    initialValues: {
+      login: "",
+      senha: "",
+      lembrarMe: false,
+    },
+    validate: {
+      login: (value) => (value.length < 3 ? "Login inválido" : null),
+      senha: (value) => (value.length < 3 ? "Senha inválida" : null),
+    },
+  });
 
   return (
     <Layout {...animationProps}>
@@ -56,7 +66,7 @@ export default function LoginForm() {
             bg={"white"}
             justify={"center"}
             align={"center"}
-            p={20}
+            p={10}
           >
             <Center>
               <Link
@@ -75,76 +85,114 @@ export default function LoginForm() {
                 justify={"center"}
                 direction={"column"}
                 w={"100%"}
-                h={"50vh"}
+                h={"40vh"}
               >
-                <TextInput
-                  id="username"
-                  name="username"
-                  type="text"
-                  placeholder="Usuário"
-                  variant="filled"
-                  w={FieldWidth}
-                  h="50px"
-                  mt={"md"}
-                />
-                <TextInput
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="Senha"
-                  variant="filled"
-                  w={FieldWidth}
-                  h="50px"
-                  mt={"md"}
-                />
-                <Flex
-                  direction={"row"}
-                  justify={"space-between"}
-                  w={"60%"}
-                  align={"center"}
-                  mt={"sm"}
-                  c={"gray.5"}
+                <form
+                  onSubmit={form.onSubmit(async (values) => {
+                    if (!props.onSubmit) return;
+                    setSubmitting(true);
+                    const handler = props.onSubmit;
+
+                    if (handler.constructor.name === "AsyncFunction") {
+                      const asyncFunc = await handler(values);
+
+                      console.log("asyncFunc", asyncFunc);
+                      if (asyncFunc) {
+                        setLogin(false);
+                      }
+                      setSubmitting(false);
+                      return;
+                    }
+                    const result = handler(values) as boolean;
+                    if (result) {
+                      setLogin(false);
+                    }
+                    setSubmitting(false);
+                    return;
+                  })}
+                  style={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                    display: "flex",
+                    flexDirection: "column",
+                    width: "100%",
+                  }}
                 >
-                  <Checkbox
-                    id="remeberMe"
-                    label="Lembrar-me"
-                    name="remeberMe"
-                    type="checkbox"
-                    size="xs"
+                  <TextInput
+                    id="login"
+                    name="login"
+                    type="text"
+                    placeholder="Usuário"
+                    variant="filled"
+                    w={FieldWidth}
+                    h="50px"
+                    mt={"md"}
+                    {...form.getInputProps("login")}
                   />
-                  <Link href="/" c="red.400" fz={".8rem"}>
-                    Recuperar senha
-                  </Link>
-                </Flex>
-                <Button
-                  mt={"md"}
-                  color="red"
-                  ml={"0"}
-                  type="submit"
-                  w={"10vw"}
-                  style={{ borderRadius: "100px" }}
-                  loading={isSubmitting}
-                  onClick={handleSubmit}
-                >
-                  Submit
-                </Button>
-                <Flex
-                  fz={"xs"}
-                  c={"#707070"}
-                  mt={"lg"}
-                  w={"100%"}
-                  justify={"center"}
-                  align={"center"}
-                  direction={"column"}
-                  lh={"15pt"}
-                >
-                  Não possui uma conta?
-                  <Flex>
-                    <Link href={"/register"} c="red.6" fz={"xs"}>
-                      registre-se.
+                  <PasswordInput
+                    id="senha"
+                    name="senha"
+                    type="senha"
+                    placeholder="Senha"
+                    variant="filled"
+                    w={FieldWidth}
+                    h="50px"
+                    mt={"md"}
+                    {...form.getInputProps("senha")}
+                  />
+                  <Flex
+                    direction={"row"}
+                    justify={"space-between"}
+                    w={"60%"}
+                    align={"center"}
+                    mt={"sm"}
+                    c={"gray.5"}
+                  >
+                    <Checkbox
+                      id="lembrarMe"
+                      label="Lembrar-me"
+                      name="lembrarMe"
+                      type="checkbox"
+                      size="xs"
+                      {...form.getInputProps("lembrarMe", {
+                        type: "checkbox",
+                      })}
+                    />
+                    <Link href="/" c="red.400" fz={".8rem"}>
+                      Recuperar senha
                     </Link>
                   </Flex>
-                </Flex>
+                  <Button
+                    mt={"md"}
+                    color="red"
+                    ml={"0"}
+                    type="submit"
+                    w={"10vw"}
+                    style={{ borderRadius: "100px" }}
+                    loading={isSubmitting}
+                  >
+                    Entrar
+                  </Button>
+                  <Flex
+                    fz={"xs"}
+                    c={"#707070"}
+                    mt={"lg"}
+                    w={"100%"}
+                    justify={"center"}
+                    align={"center"}
+                    direction={"column"}
+                  >
+                    <span>
+                      Não possui uma conta?
+                      <Link
+                        href={"/register"}
+                        c="red.6"
+                        fz={"xs"}
+                        label={" registre-se."}
+                      />
+                    </span>
+                  </Flex>
+                </form>
               </Flex>
             </Center>
           </Flex>

@@ -1,6 +1,6 @@
 "use client";
-import { Content } from "../@Types/Page";
-import { Carro } from "../@Types/Carro";
+import { Content } from "@/@Types/Page";
+import { Carro } from "@/@Types/Carro";
 import React from "react";
 import CardCarro from "./Card";
 import { Pagination, SimpleGrid } from "@mantine/core";

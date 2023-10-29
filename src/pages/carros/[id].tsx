@@ -19,9 +19,8 @@ import { IconUser } from "@tabler/icons-react";
 import { IconHeart } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/router";
-import { MaskedInput } from "../Component/MaskedInput";
-import { Carro } from "../@Types/Carro";
-import { Content } from "../@Types/Page";
+import { MaskedInput } from "@/Component/MaskedInput";
+import { Carro } from "@/@Types/Carro";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Head from "next/head";
 

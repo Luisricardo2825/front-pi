@@ -7,7 +7,7 @@ import {
   Group,
   CardSection,
 } from "@mantine/core";
-import { Carro } from "../@Types/Carro";
+import { Carro } from "@/@Types/Carro";
 import Link from "next/link";
 import { BRlFormat } from "../utils/Formatter";
 

@@ -10,8 +10,14 @@ import type {
 } from "react";
 interface IProps extends UnstyledButtonProps {
   href: string;
+  label?: string;
   onClick?: MouseEventHandler<HTMLAnchorElement> | undefined;
 }
 export default function Link(props: PropsWithChildren<IProps>): ReactNode {
-  return <UnstyledButton component={NextLink} {...props} />;
+  const { children, label } = props;
+  return (
+    <UnstyledButton component={NextLink} {...props}>
+      {children ? children : label}
+    </UnstyledButton>
+  );
 }
