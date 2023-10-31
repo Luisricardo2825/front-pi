@@ -9,11 +9,11 @@ import {
 } from "@mantine/core";
 import { Carro } from "@/@Types/Carro";
 import Link from "next/link";
-import { BRlFormat } from "../utils/Formatter";
+import { BRlFormat } from "@/utils/Formatter";
 
 export default function CardCarro(props: Carro) {
   return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder maw={"20vw"}>
+    <Card shadow="sm" padding="lg" radius="xs" withBorder maw={"100vw"}>
       <CardSection>
         <Image src={props.image} height={160} alt="Norway" />
       </CardSection>

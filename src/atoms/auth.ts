@@ -1,9 +1,7 @@
 import { LoginRet } from "@/@Types/Login";
-import { atomWithStorage } from "jotai/utils";
+import { atom, createStore } from "jotai";
 import Cookies from "js-cookie";
 
+export const myStore = createStore();
 const data = Cookies.get("user");
-export const userAtom = atomWithStorage<LoginRet | undefined>(
-  "user",
-  data ? JSON.parse(data) : undefined
-);
+export const userAtom = atom(data ? (JSON.parse(data) as LoginRet) : undefined);

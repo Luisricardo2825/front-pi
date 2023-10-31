@@ -1,49 +1,42 @@
-import {
-  Button,
-  Center,
-  Checkbox,
-  Flex,
-  Paper,
-  PasswordInput,
-  TextInput,
-} from "@mantine/core";
+import "@mantine/dates/styles.css";
+
+import { Button, Center, Flex, Paper, TextInput } from "@mantine/core";
 import React from "react";
 import Link from "@/Component/Link";
-
-import classes from "./Login.module.css";
 import Layout from "../Layout";
+import classes from "./Recuperar.module.css";
 import { useForm } from "@mantine/form";
+import { DateInput } from "@mantine/dates";
 
 export interface Formvalues {
   login: string;
-  senha: string;
-  lembrarMe: boolean;
+  dataNascimento: string;
 }
 interface ILoginProps {
   onSubmit?: (values: Formvalues) => boolean | Promise<boolean>;
 }
-export default function LoginForm(props: ILoginProps) {
+export default function RecuperarForm(props: ILoginProps) {
   const FieldWidth = "20vw";
   const [isSubmitting, setSubmitting] = React.useState(false);
 
   const [isLogin, setLogin] = React.useState(true);
   let animationProps = isLogin
     ? {
-        initial: { rotateY: 90 },
+        initial: { rotateY: -90 },
         animate: { rotateY: 0, transition: { duration: 0.3, ease: "linear" } },
-        exit: { rotateY: 90, transition: { duration: 0.3, ease: "linear" } },
+        exit: { rotateY: -90, transition: { duration: 0.3, ease: "linear" } },
       }
     : undefined;
 
   const form = useForm({
     initialValues: {
       login: "",
-      senha: "",
-      lembrarMe: false,
+      dataNascimento: "",
     },
     validate: {
-      login: (value) => (value.length < 3 ? "Login inválido" : null),
-      senha: (value) => (value.length < 3 ? "Senha inválida" : null),
+      login: (value) => (value.length < 3 ? "Usuário inválido" : null),
+      dataNascimento: (value) =>
+        value.length < 3 ? "Data de nascimento inválida" : null,
     },
   });
 
@@ -68,13 +61,12 @@ export default function LoginForm(props: ILoginProps) {
           >
             <Center>
               <Link
-                fz={"3rem"}
+                fz={"2rem"}
                 className={classes.link}
                 href="/"
                 onClick={() => setLogin(false)}
-                w={"fit-content"}
               >
-                Login
+                Esqueci a senha
               </Link>
             </Center>
             <Center w={"100%"}>
@@ -127,39 +119,17 @@ export default function LoginForm(props: ILoginProps) {
                     mt={"md"}
                     {...form.getInputProps("login")}
                   />
-                  <PasswordInput
-                    id="senha"
-                    name="senha"
-                    type="senha"
-                    placeholder="Senha"
+                  <DateInput
+                    valueFormat="DD/MM/YYYY"
+                    id="dataNascimento"
+                    name="dataNascimento"
+                    placeholder="Data Nascimento"
                     variant="filled"
                     w={FieldWidth}
                     h="50px"
                     mt={"md"}
-                    {...form.getInputProps("senha")}
+                    {...form.getInputProps("dataNascimento")}
                   />
-                  <Flex
-                    direction={"row"}
-                    justify={"space-between"}
-                    w={"60%"}
-                    align={"center"}
-                    mt={"sm"}
-                    c={"gray.5"}
-                  >
-                    <Checkbox
-                      id="lembrarMe"
-                      label="Lembrar-me"
-                      name="lembrarMe"
-                      type="checkbox"
-                      size="xs"
-                      {...form.getInputProps("lembrarMe", {
-                        type: "checkbox",
-                      })}
-                    />
-                    <Link href="/recuperar" c="red.400" fz={".8rem"}>
-                      Recuperar senha
-                    </Link>
-                  </Flex>
                   <Button
                     mt={"md"}
                     color="red"
@@ -169,7 +139,7 @@ export default function LoginForm(props: ILoginProps) {
                     style={{ borderRadius: "100px" }}
                     loading={isSubmitting}
                   >
-                    Entrar
+                    Encontrar conta
                   </Button>
                   <Flex
                     fz={"xs"}
@@ -181,12 +151,12 @@ export default function LoginForm(props: ILoginProps) {
                     direction={"column"}
                   >
                     <span>
-                      Não possui uma conta?
+                      Ir para
                       <Link
-                        href={"/register"}
+                        href={"/login"}
                         c="red.6"
                         fz={"xs"}
-                        label={" registre-se."}
+                        label={" Login."}
                       />
                     </span>
                   </Flex>
