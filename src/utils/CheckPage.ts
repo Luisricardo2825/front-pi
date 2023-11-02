@@ -1,5 +1,13 @@
-const PagesWithoutNavbar: Array<string> = ["/login", "/register", "/recuperar"];
-const PagesWithoutFooter: Array<string> = ["/login", "/register", "/recuperar"];
+const PagesWithoutNavbar: Array<string> = [
+  "/login",
+  "/admin/usuarios/register",
+  "/recuperar",
+];
+const PagesWithoutFooter: Array<string> = [
+  "/login",
+  "/admin/usuarios/register",
+  "/recuperar",
+];
 
 const Check = (path: string, type: string) => {
   if (type.toLocaleLowerCase() === "navbar") {

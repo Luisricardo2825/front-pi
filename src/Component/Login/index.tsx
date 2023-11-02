@@ -13,6 +13,7 @@ import Link from "@/Component/Link";
 import classes from "./Login.module.css";
 import Layout from "../Layout";
 import { useForm } from "@mantine/form";
+import resolveSubmit from "@/utils/resolveSubmit";
 
 export interface Formvalues {
   login: string;
@@ -87,25 +88,17 @@ export default function LoginForm(props: ILoginProps) {
               >
                 <form
                   onSubmit={form.onSubmit(async (values) => {
-                    if (!props.onSubmit) return;
-                    setSubmitting(true);
-                    const handler = props.onSubmit;
+                    const { animate, submiting, ok } = await resolveSubmit({
+                      values,
+                      callBack: () => setSubmitting(true),
+                      onSubmit: props.onSubmit,
+                      runAnimation: setSubmitting,
+                    });
+                    
+                    setLogin(animate);
 
-                    if (handler.constructor.name === "AsyncFunction") {
-                      const asyncFunc = await handler(values);
-
-                      if (asyncFunc) {
-                        setLogin(false);
-                      }
-                      setSubmitting(false);
-                      return;
-                    }
-                    const result = handler(values) as boolean;
-                    if (result) {
-                      setLogin(false);
-                    }
-                    setSubmitting(false);
-                    return;
+                    setSubmitting(submiting);
+                    return ok;
                   })}
                   style={{
                     alignItems: "center",
@@ -170,7 +163,7 @@ export default function LoginForm(props: ILoginProps) {
                   >
                     Entrar
                   </Button>
-                  <Flex
+                  {/* <Flex
                     fz={"xs"}
                     c={"#707070"}
                     mt={"lg"}
@@ -188,7 +181,7 @@ export default function LoginForm(props: ILoginProps) {
                         label={" registre-se."}
                       />
                     </span>
-                  </Flex>
+                  </Flex> */}
                 </form>
               </Flex>
             </Center>

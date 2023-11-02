@@ -8,6 +8,7 @@ import {
   Box,
   rem,
   PasswordInputProps,
+  Title,
 } from "@mantine/core";
 
 function PasswordRequirement({
@@ -100,6 +101,7 @@ export default function PasswordWithStrengthChecker(
       </Popover.Target>
       <Popover.Dropdown>
         <Progress color={color} value={strength} size={5} mb="xs" />
+        <Title order={6}> Recomendado:</Title>
         <PasswordRequirement
           label="Precisa de incluir no minimo 6 caracteres"
           meets={value.length > 5}

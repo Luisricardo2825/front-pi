@@ -31,7 +31,7 @@ Router.events.on("routeChangeComplete", () => nprogress.complete());
 Router.events.on("routeChangeError", () => nprogress.complete());
 
 export default function App({ Component, pageProps, router }: AppProps) {
-  const idle = useIdle(30000, { initialState: false });
+  const idle = useIdle(1000, { initialState: false });
   const Router = useRouter();
   const isNavbarVisible = Check(Router.pathname, "navbar");
   const isFooterVisible = Check(Router.pathname, "footer");

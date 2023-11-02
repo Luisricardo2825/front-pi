@@ -2,21 +2,23 @@ import { LoginRet } from "@/@Types/Login";
 import { myStore, userAtom } from "@/atoms/auth";
 import { notifications } from "@mantine/notifications";
 import Cookies from "js-cookie";
+import userAuthorities from "./UserAuthorities";
 
 const pagesBlocked = ["/login", "/register", "/recuperar"];
-const authOnlyPages = ["^/admin.*$"];
+const authOnlyPages = [{ rule: "^/admin.*$", roles: ["ADMIN"] }];
 
 export default async function refreshToken(pathName: string) {
   const user = myStore.get(userAtom);
+
   const cookie = Cookies.get("user");
   if (!cookie) {
     console.log("Cookie não encontrado");
     for (const rule of authOnlyPages) {
-      if (checkRoute(rule, pathName)) {
+      if (checkRoute(rule.rule, pathName)) {
         console.log(
           `Não é possivel ir para a pagina "${pathName}" enquanto não logado! Faça login primeiro!`
         );
-        return pathName;
+        return "/";
       }
     }
     if (user) {
@@ -72,7 +74,7 @@ export default async function refreshToken(pathName: string) {
   });
   console.log("Token renovado");
 
-  return "/";
+  return pathName;
 }
 
 // function CheckIfAuthenticated() {

@@ -9,50 +9,76 @@ import Link from "@/Component/Link";
 import classes from "./Register.module.css";
 import Layout from "../Layout";
 import PasswordWithStrengthChecker from "../PasswordWithStrengthChecker";
+import { useForm } from "@mantine/form";
+import resolveSubmit from "@/utils/resolveSubmit";
 
-const RegisterForm: React.FC = () => {
-  const [isLogin, setIslogin] = React.useState(true);
+export interface RegisterFormvalues {
+  login: string;
+  nome: string;
+  senha: string;
+  dataNascimento: string;
+}
+interface IRegisterProps {
+  onSubmit?: (values: RegisterFormvalues) => boolean | Promise<boolean>;
+}
+
+const RegisterForm: React.FC<IRegisterProps> = (props) => {
+  const [isSubmitting, setSubmitting] = React.useState(false);
+
   const TextInputWidth = "20vw";
-  let animationProps = isLogin
-    ? {
-        initial: { rotateY: -90 },
-        animate: { rotateY: 0, transition: { duration: 0.3, ease: "linear" } },
-        exit: { rotateY: -90, transition: { duration: 0.3, ease: "linear" } },
-      }
-    : undefined;
+
+  const form = useForm({
+    initialValues: {
+      login: "",
+      senha: "",
+      nome: "",
+      dataNascimento: "",
+    },
+    validate: {
+      login: (value) => (value.length < 3 ? "Login inválido" : null),
+      senha: (value) => (value.length < 3 ? "Senha inválida" : null),
+      dataNascimento: (value) =>
+        value.length < 3 ? "Data de nascimento inválida" : null,
+      nome: (value) => (value.length < 3 ? "Nome inválido" : null),
+    },
+  });
   return (
-    <Layout {...animationProps}>
-      <Center>
-        <Paper
+    <Center>
+      <Paper
+        style={{
+          boxShadow: "5px 10px 15px #1d1a1a5e",
+        }}
+      >
+        <Flex
+          w={"30vw"}
+          direction="column"
           style={{
-            boxShadow: "5px 10px 15px #1d1a1a5e",
+            borderRadius: "10px",
           }}
+          bg={"white"}
+          justify={"center"}
+          align={"center"}
+          p={10}
         >
-          <Flex
-            w={"30vw"}
-            direction="column"
-            style={{
-              borderRadius: "10px",
-            }}
-            bg={"white"}
-            justify={"center"}
-            align={"center"}
-            p={10}
-          >
-            <Center>
-              <Link
-                fz={"3rem"}
-                className={classes.link}
-                href="/"
-                onClick={() => {
-                  setIslogin(false);
-                }}
-                w={"fit-content"}
-              >
-                Registrar
-              </Link>
-            </Center>
-            <Center w={"100%"}>
+          <Center>
+            <Text fz={"3rem"} w={"fit-content"} className={classes.link}>
+              Novo usuário
+            </Text>
+          </Center>
+          <Center w={"100%"}>
+            <form
+              onSubmit={form.onSubmit(async (values) => {
+                const { submiting, ok } = await resolveSubmit({
+                  values,
+                  callBack: () => setSubmitting(true),
+                  onSubmit: props.onSubmit,
+                  runAnimation: setSubmitting,
+                });
+
+                setSubmitting(submiting);
+                return ok;
+              })}
+            >
               <Flex
                 align={"center"}
                 justify={"center"}
@@ -71,6 +97,20 @@ const RegisterForm: React.FC = () => {
                   w={TextInputWidth}
                   height="50px"
                   mt={"md"}
+                  {...form.getInputProps("nome")}
+                />
+                <TextInput
+                  id="login"
+                  name="login"
+                  type="text"
+                  placeholder="Login"
+                  label="Login"
+                  withAsterisk
+                  variant="filled"
+                  w={TextInputWidth}
+                  height="50px"
+                  mt={"md"}
+                  {...form.getInputProps("login")}
                 />
                 <PasswordWithStrengthChecker
                   id="password"
@@ -83,6 +123,7 @@ const RegisterForm: React.FC = () => {
                   w={TextInputWidth}
                   height="50px"
                   mt={"md"}
+                  {...form.getInputProps("senha")}
                 />
                 <DateInput
                   valueFormat="DD/MM/YYYY"
@@ -95,13 +136,15 @@ const RegisterForm: React.FC = () => {
                   w={TextInputWidth}
                   height="50px"
                   mt={"md"}
+                  {...form.getInputProps("dataNascimento")}
                 />
                 <Flex
-                  justify={"center"}
-                  align={"center"}
-                  direction={"column"}
+                  justify={"flex-end"}
+                  align={"flex-end"}
+                  direction={"row"}
                   m={10}
                   mt={"md"}
+                  w={"100%"}
                 >
                   <Button
                     color="red"
@@ -109,30 +152,17 @@ const RegisterForm: React.FC = () => {
                     type="submit"
                     w={"100%"}
                     style={{ borderRadius: 100 }}
+                    loading={isSubmitting}
                   >
-                    Register
+                    Registrar
                   </Button>
-                  <Flex
-                    w={"100%"}
-                    justify={"center"}
-                    align={"center"}
-                    direction={"column"}
-                    mb={"sm"}
-                  >
-                    <Text size={"sm"} c={"#afafaf"} fz={"xs"} mt={"md"} p={2}>
-                      Já possui uma conta?{" "}
-                      <Link c={"red"} href="/login" fz={"xs"}>
-                        Entrar
-                      </Link>
-                    </Text>
-                  </Flex>
                 </Flex>
               </Flex>
-            </Center>
-          </Flex>
-        </Paper>
-      </Center>
-    </Layout>
+            </form>
+          </Center>
+        </Flex>
+      </Paper>
+    </Center>
   );
 };
 

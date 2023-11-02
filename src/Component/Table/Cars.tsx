@@ -8,6 +8,7 @@ import {
   Anchor,
   ActionIcon,
   Flex,
+  Tooltip,
 } from "@mantine/core";
 import classes from "./TableScrollArea.module.css";
 import { Carro } from "@/@Types/Carro";
@@ -16,17 +17,28 @@ import { IconAdjustments, IconTrash } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
 import fetchApi from "@/utils/fetcher";
 import { notifications } from "@mantine/notifications";
+import { useRouter } from "next/router";
+import Link from "next/link";
 
 export function CarTable({ data }: { data: Carro[] }) {
   const [scrolled, setScrolled] = useState(false);
-
+  const router = useRouter();
   const rows = data.map((row) => (
     <Table.Tr key={row.id}>
-      <Table.Td>{row.id}</Table.Td>
+      <Table.Td>
+        <Tooltip label="Exibir">
+          <Anchor
+            component={Link}
+            href={{ pathname: "/carros/[id]", query: { id: row.id } }}
+          >
+            {row.id}
+          </Anchor>
+        </Tooltip>
+      </Table.Td>
       <Table.Td>
         <HoverCard
           shadow="md"
-          position="left"
+          position="right"
           styles={{ dropdown: { border: "none", padding: 0 } }}
         >
           <HoverCard.Target>
@@ -48,7 +60,7 @@ export function CarTable({ data }: { data: Carro[] }) {
       <Table.Td>{BrDateFormat.format(new Date(row.anoModelo))}</Table.Td>
       <Table.Td>{BrDateFormat.format(new Date(row.anoFabricacao))}</Table.Td>
       <Table.Td>
-        <Flex justify={"space-between"}>
+        <Flex justify={"space-around"} direction={"row"}>
           <ActionIcon>
             <IconAdjustments />
           </ActionIcon>
@@ -69,6 +81,14 @@ export function CarTable({ data }: { data: Carro[] }) {
                       if (!res.ok) {
                         throw await res.json();
                       }
+                      notifications.show({
+                        message: "Deletado com sucesso",
+                        color: "green",
+                      });
+
+                      router.push({
+                        ...router,
+                      });
                     })
                     .catch(async (err) => {
                       if (err instanceof Error) {

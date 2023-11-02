@@ -47,15 +47,6 @@ const links: Links[] = [
     ),
     showWhen: "anonymous",
   },
-  {
-    link: "/register",
-    label: (
-      <Flex align={"center"} c={"red.6"}>
-        Registrar
-      </Flex>
-    ),
-    showWhen: "anonymous",
-  },
 ];
 
 export function HeaderMenu() {

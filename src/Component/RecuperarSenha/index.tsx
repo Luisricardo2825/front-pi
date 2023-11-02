@@ -7,6 +7,7 @@ import Layout from "../Layout";
 import classes from "./Recuperar.module.css";
 import { useForm } from "@mantine/form";
 import { DateInput } from "@mantine/dates";
+import resolveSubmit from "@/utils/resolveSubmit";
 
 export interface Formvalues {
   login: string;
@@ -79,25 +80,17 @@ export default function RecuperarForm(props: ILoginProps) {
               >
                 <form
                   onSubmit={form.onSubmit(async (values) => {
-                    if (!props.onSubmit) return;
-                    setSubmitting(true);
-                    const handler = props.onSubmit;
+                    const { animate, submiting, ok } = await resolveSubmit({
+                      values,
+                      callBack: () => setSubmitting(true),
+                      onSubmit: props.onSubmit,
+                      runAnimation: setSubmitting,
+                    });
 
-                    if (handler.constructor.name === "AsyncFunction") {
-                      const asyncFunc = await handler(values);
+                    setLogin(animate);
 
-                      if (asyncFunc) {
-                        setLogin(false);
-                      }
-                      setSubmitting(false);
-                      return;
-                    }
-                    const result = handler(values) as boolean;
-                    if (result) {
-                      setLogin(false);
-                    }
-                    setSubmitting(false);
-                    return;
+                    setSubmitting(submiting);
+                    return ok;
                   })}
                   style={{
                     alignItems: "center",

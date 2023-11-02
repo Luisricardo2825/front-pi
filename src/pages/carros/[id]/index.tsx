@@ -57,9 +57,7 @@ export default function Page({
 
     const requestOptions: RequestInit = {
       method: "POST",
-      headers: myHeaders,
       body: raw,
-      redirect: "follow",
     };
 
     const response = await fetchApi("/interests", requestOptions);

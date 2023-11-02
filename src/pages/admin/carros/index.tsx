@@ -125,7 +125,7 @@ export default function Admin({
         </Paper>
       </Grid.Col>
       <Grid.Col span={9}>
-        <Container mt={50}>
+        <Container mt={50} size={"xl"}>
           <Flex justify={"space-between"}>
             <Pagination
               total={response.totalPages}
