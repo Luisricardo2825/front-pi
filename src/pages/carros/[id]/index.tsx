@@ -25,6 +25,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Head from "next/head";
 import { useForm } from "@mantine/form";
 import { LoginRet } from "@/@Types/Login";
+import fetchApi from "@/utils/fetcher";
 
 type Interest = { nome: string; telefone: string };
 export default function Page({
@@ -44,7 +45,7 @@ export default function Page({
   });
   const router = useRouter();
   const { id } = router.query;
-  function onSubmit(values: Interest) {
+  async function onSubmit(values: Interest) {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
@@ -61,25 +62,23 @@ export default function Page({
       redirect: "follow",
     };
 
-    fetch(process.env.NEXT_PUBLIC_API_PATH + "/interests", requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        notifications.show({
-          title: "Sucesso",
-          color: "green",
-          message: "Interesse registrado!",
-        });
-        router.push("/carros");
-      })
-      .catch((error) => {
-        notifications.show({
-          title: "Erro",
-          color: "red",
-          message: "Erro:" + error,
-        });
-        console.error(error);
-      })
-      .finally(close);
+    const response = await fetchApi("/interests", requestOptions);
+
+    const data = await response.json();
+    if (response.ok) {
+      notifications.show({
+        title: "Sucesso",
+        color: "green",
+        message: "Interesse registrado!",
+      });
+      router.push("/carros");
+    } else {
+      notifications.show({
+        title: "Erro",
+        color: "red",
+        message: data.message,
+      });
+    }
   }
 
   carro.anoModelo = carro.anoModelo.slice(0, 4);

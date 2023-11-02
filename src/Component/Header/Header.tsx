@@ -20,10 +20,23 @@ import { userAtom } from "@/atoms/auth";
 import { useRouter } from "next/router";
 import Cookies from "js-cookie";
 import { notifications } from "@mantine/notifications";
+import userAuthorities from "@/utils/UserAuthorities";
 
-type Links = { link: string; label: ReactNode; links?: Links[] };
+type Links = {
+  link: string;
+  label: ReactNode;
+  links?: Links[];
+  onlyAdmin?: boolean;
+  showWhen: "authenticated" | "anonymous" | "always";
+};
 const links: Links[] = [
-  { link: "/carros", label: "Carros" },
+  {
+    link: "/admin",
+    label: "Gerenciamento",
+    onlyAdmin: true,
+    showWhen: "authenticated",
+  },
+  { link: "/carros", label: "Carros", showWhen: "always" },
   {
     link: "/login",
     label: (
@@ -32,6 +45,7 @@ const links: Links[] = [
         Entrar
       </Flex>
     ),
+    showWhen: "anonymous",
   },
   {
     link: "/register",
@@ -40,61 +54,75 @@ const links: Links[] = [
         Registrar
       </Flex>
     ),
+    showWhen: "anonymous",
   },
 ];
 
 export function HeaderMenu() {
   const [opened, { toggle }] = useDisclosure(false);
   const [isClient, setIsClient] = React.useState(false);
+  const [user, setUser] = useAtom(userAtom);
 
+  const isAuthenticated = user !== undefined;
+  const isAnonymous = user === undefined;
   React.useEffect(() => {
     setIsClient(true);
   }, []);
-  const [user, setUser] = useAtom(userAtom);
   const router = useRouter();
   const filteredItems = links.filter((item) => {
-    if (isClient && user) {
-      return !["/login", "/register"].includes(item.link);
-    } else {
-      return true;
+    if (item.onlyAdmin) {
+      const { isAdmin } = userAuthorities(user);
+      if (isAdmin) return true;
+      return false;
     }
+    if (item.showWhen == "authenticated") {
+      if (isAuthenticated) return true;
+      return false;
+    }
+    if (item.showWhen == "anonymous") {
+      if (isAnonymous) return true;
+      return false;
+    }
+    return true;
   });
-  const items = filteredItems.map((link) => {
-    const menuItems = link.links?.map((item) => (
-      <Menu.Item key={item.link}>{item.label}</Menu.Item>
-    ));
+  const items = isClient
+    ? filteredItems.map((link) => {
+        const menuItems = link.links?.map((item) => (
+          <Menu.Item key={item.link}>{item.label}</Menu.Item>
+        ));
 
-    if (menuItems) {
-      return (
-        <Menu
-          key={link.link}
-          trigger="hover"
-          transitionProps={{ exitDuration: 0 }}
-          withinPortal
-        >
-          <Menu.Target>
-            <Link
-              href={link.link}
-              className={classes.link}
-              onClick={(event) => event.preventDefault()}
+        if (menuItems) {
+          return (
+            <Menu
+              key={link.link}
+              trigger="hover"
+              transitionProps={{ exitDuration: 0 }}
+              withinPortal
             >
-              <Center>
-                <span className={classes.linkLabel}>{link.label}</span>
-                <IconChevronDown size="0.9rem" stroke={1.5} />
-              </Center>
-            </Link>
-          </Menu.Target>
-          <Menu.Dropdown>{menuItems}</Menu.Dropdown>
-        </Menu>
-      );
-    }
+              <Menu.Target>
+                <Link
+                  href={link.link}
+                  className={classes.link}
+                  onClick={(event) => event.preventDefault()}
+                >
+                  <Center>
+                    <span className={classes.linkLabel}>{link.label}</span>
+                    <IconChevronDown size="0.9rem" stroke={1.5} />
+                  </Center>
+                </Link>
+              </Menu.Target>
+              <Menu.Dropdown>{menuItems}</Menu.Dropdown>
+            </Menu>
+          );
+        }
 
-    return (
-      <Link key={link.link} href={link.link} className={classes.link}>
-        {link.label}
-      </Link>
-    );
-  });
+        return (
+          <Link key={link.link} href={link.link} className={classes.link}>
+            {link.label}
+          </Link>
+        );
+      })
+    : [];
 
   return (
     <header className={classes.header}>

@@ -94,7 +94,6 @@ export default function LoginForm(props: ILoginProps) {
                     if (handler.constructor.name === "AsyncFunction") {
                       const asyncFunc = await handler(values);
 
-                      console.log("asyncFunc", asyncFunc);
                       if (asyncFunc) {
                         setLogin(false);
                       }

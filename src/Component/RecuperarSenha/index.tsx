@@ -86,7 +86,6 @@ export default function RecuperarForm(props: ILoginProps) {
                     if (handler.constructor.name === "AsyncFunction") {
                       const asyncFunc = await handler(values);
 
-                      console.log("asyncFunc", asyncFunc);
                       if (asyncFunc) {
                         setLogin(false);
                       }
