@@ -1,11 +1,13 @@
 import { LoginRet } from "@/@Types/Login";
 import { Content } from "@/@Types/Page";
+import { RegisterResponse } from "@/@Types/Register";
 import { User } from "@/@Types/User";
 import RegisterForm, { RegisterFormvalues } from "@/Component/Register";
 import { UsersTable } from "@/Component/Table/User";
 import fetchApi from "@/utils/fetcher";
-import { Button, Container } from "@mantine/core";
+import { Button, Container, Flex } from "@mantine/core";
 import { modals } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
 import { IconPlus } from "@tabler/icons-react";
 import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import { useRouter } from "next/router";
@@ -16,11 +18,44 @@ export default function Admin({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
   const onSubmit = async (values: RegisterFormvalues) => {
-    alert(JSON.stringify(values));
-    return true;
-  };
+    try {
+      const response = await fetchApi("/users", {
+        method: "POST",
+        body: JSON.stringify(values),
+      });
+      if (!response.ok) {
+        throw response;
+      }
 
-  console.log(users.content);
+      const result: RegisterResponse = await response.json();
+
+      notifications.show({
+        title: "Sucesso",
+        color: "green",
+        message: "Cadastrado com sucesso. Id:" + result.id,
+      });
+      router.replace("/admin/usuarios");
+      return true;
+    } catch (result) {
+      if (result instanceof Error) {
+        notifications.show({
+          title: "Erro",
+          color: "red",
+          message: result + "",
+        });
+        return false;
+      }
+      const data = await (result as Response).json();
+      notifications.show({
+        title: "Erro",
+        color: "red",
+        message: data.message,
+      });
+      return false;
+    } finally {
+      modals.closeAll();
+    }
+  };
   return (
     <Container>
       <Button
@@ -31,7 +66,8 @@ export default function Admin({
           modals.open({
             withCloseButton: false,
             children: <RegisterForm onSubmit={onSubmit} />,
-            size: "lg",
+            size: "xl",
+            // fullScreen: true,
             styles: {
               body: {
                 backgroundColor: "transparent",
@@ -54,7 +90,7 @@ export default function Admin({
       >
         Novo
       </Button>
-      <UsersTable users={users.content} />
+      <UsersTable users={users?.content} />
     </Container>
   );
 }
@@ -62,14 +98,17 @@ export default function Admin({
 export const getServerSideProps = (async (context) => {
   const { token } = JSON.parse(context.req.cookies["user"] || "{}") as LoginRet;
   try {
-    const users: Content<User> = await (
-      await fetchApi("/users", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + token,
-        },
-      })
-    ).json();
+    const res = await fetchApi("/users", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(res.statusText);
+    }
+    const users: Content<User> = await res.json();
 
     return {
       props: { users },
@@ -77,12 +116,9 @@ export const getServerSideProps = (async (context) => {
   } catch (error) {
     console.error(error);
     return {
-      redirect: {
-        destination: "/login",
-        permanent: false,
-      },
+      props: { users: undefined },
     };
   }
 }) satisfies GetServerSideProps<{
-  users: Content<User>;
+  users?: Content<User>;
 }>;

@@ -32,7 +32,7 @@ export default function Login() {
       const result = await response.json();
 
       const data: LoginRet = result as LoginRet;
-      const exp = new Date(data.exp);
+      const exp = new Date(data.refresh_token);
       cookie.set("user", JSON.stringify(data), { expires: exp });
 
       setUser(data);

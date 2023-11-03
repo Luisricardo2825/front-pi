@@ -5,7 +5,7 @@ interface Authorities {
   isNormalUser: boolean;
   isAnonymous: boolean;
 }
-export default function userAuthorities(user: LoginRet | undefined) {
+export default function userAuthorities(user: LoginRet | null) {
   const authorities: Authorities = {
     isAdmin: false,
     isNormalUser: false,

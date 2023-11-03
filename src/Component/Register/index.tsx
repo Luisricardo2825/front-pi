@@ -1,13 +1,18 @@
 import "@mantine/dates/styles.css";
 import { DateInput } from "@mantine/dates";
 
-import { Button, Center, Flex, Paper, Text, TextInput } from "@mantine/core";
+import {
+  Button,
+  Center,
+  Flex,
+  Paper,
+  Select,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import React from "react";
 
-import Link from "@/Component/Link";
-
 import classes from "./Register.module.css";
-import Layout from "../Layout";
 import PasswordWithStrengthChecker from "../PasswordWithStrengthChecker";
 import { useForm } from "@mantine/form";
 import resolveSubmit from "@/utils/resolveSubmit";
@@ -17,6 +22,7 @@ export interface RegisterFormvalues {
   nome: string;
   senha: string;
   dataNascimento: string;
+  role: "USER" | "ADMIN";
 }
 interface IRegisterProps {
   onSubmit?: (values: RegisterFormvalues) => boolean | Promise<boolean>;
@@ -27,12 +33,13 @@ const RegisterForm: React.FC<IRegisterProps> = (props) => {
 
   const TextInputWidth = "20vw";
 
-  const form = useForm({
+  const form = useForm<RegisterFormvalues>({
     initialValues: {
       login: "",
       senha: "",
       nome: "",
       dataNascimento: "",
+      role: "USER",
     },
     validate: {
       login: (value) => (value.length < 3 ? "Login inválido" : null),
@@ -40,6 +47,7 @@ const RegisterForm: React.FC<IRegisterProps> = (props) => {
       dataNascimento: (value) =>
         value.length < 3 ? "Data de nascimento inválida" : null,
       nome: (value) => (value.length < 3 ? "Nome inválido" : null),
+      role: (value) => (value.length < 3 ? "Role inválida" : null),
     },
   });
   return (
@@ -61,19 +69,20 @@ const RegisterForm: React.FC<IRegisterProps> = (props) => {
           p={10}
         >
           <Center>
-            <Text fz={"3rem"} w={"fit-content"} className={classes.link}>
+            <Text fz={"2rem"} w={"fit-content"} className={classes.link}>
               Novo usuário
             </Text>
           </Center>
           <Center w={"100%"}>
             <form
               onSubmit={form.onSubmit(async (values) => {
-                const { submiting, ok } = await resolveSubmit({
-                  values,
-                  callBack: () => setSubmitting(true),
-                  onSubmit: props.onSubmit,
-                  runAnimation: setSubmitting,
-                });
+                const { submiting, ok } =
+                  await resolveSubmit<RegisterFormvalues>({
+                    values,
+                    callBack: () => setSubmitting(true),
+                    onSubmit: props.onSubmit,
+                    runAnimation: setSubmitting,
+                  });
 
                 setSubmitting(submiting);
                 return ok;
@@ -84,7 +93,7 @@ const RegisterForm: React.FC<IRegisterProps> = (props) => {
                 justify={"center"}
                 direction={"column"}
                 w={"100%"}
-                h={"40vh"}
+                h={"50vh"}
               >
                 <TextInput
                   id="name"
@@ -96,8 +105,21 @@ const RegisterForm: React.FC<IRegisterProps> = (props) => {
                   variant="filled"
                   w={TextInputWidth}
                   height="50px"
-                  mt={"md"}
+                  mt={"sm"}
                   {...form.getInputProps("nome")}
+                />
+                <Select
+                  id="role"
+                  name="role"
+                  placeholder="Cargo"
+                  label="Cargo"
+                  withAsterisk
+                  variant="filled"
+                  w={TextInputWidth}
+                  height="50px"
+                  mt={"sm"}
+                  data={["ADMIN", "USER"]}
+                  {...form.getInputProps("role")}
                 />
                 <TextInput
                   id="login"
@@ -122,7 +144,7 @@ const RegisterForm: React.FC<IRegisterProps> = (props) => {
                   variant="filled"
                   w={TextInputWidth}
                   height="50px"
-                  mt={"md"}
+                  mt={"sm"}
                   {...form.getInputProps("senha")}
                 />
                 <DateInput
@@ -135,7 +157,8 @@ const RegisterForm: React.FC<IRegisterProps> = (props) => {
                   variant="filled"
                   w={TextInputWidth}
                   height="50px"
-                  mt={"md"}
+                  mt={"sm"}
+                  mb={"md"}
                   {...form.getInputProps("dataNascimento")}
                 />
                 <Flex

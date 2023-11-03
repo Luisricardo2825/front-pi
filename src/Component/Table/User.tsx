@@ -2,8 +2,8 @@ import { User } from "@/@Types/User";
 import { BrDateFormat } from "@/utils/Formatter";
 import { Avatar, Badge, Table, Group, Text } from "@mantine/core";
 
-export function UsersTable({ users }: { users: User[] }) {
-  const rows = users.map((item) => (
+export function UsersTable({ users }: { users?: User[] }) {
+  const rows = users?.map((item) => (
     <Table.Tr key={item.id}>
       <Table.Td>
         <Group gap="sm">

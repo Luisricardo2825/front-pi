@@ -37,7 +37,7 @@ export default function Admin({
     selected.length > 0 ? selected : []
   );
 
-  const cars = React.useMemo(
+  const cars: Carro[] = React.useMemo(
     () => (response?.ok ? response?.content : []),
     [response]
   );
@@ -229,7 +229,6 @@ export const getServerSideProps = (async (context) => {
         headers: headers,
       })
     ).json();
-
     const response: Response = {
       ok: true,
       message: "",

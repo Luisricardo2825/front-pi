@@ -54,8 +54,8 @@ export function HeaderMenu() {
   const [isClient, setIsClient] = React.useState(false);
   const [user, setUser] = useAtom(userAtom);
 
-  const isAuthenticated = user !== undefined;
-  const isAnonymous = user === undefined;
+  const isAuthenticated = user !== null;
+  const isAnonymous = user === null;
   React.useEffect(() => {
     setIsClient(true);
   }, []);
@@ -152,7 +152,7 @@ export function HeaderMenu() {
                   </Menu.Item>
                   <Menu.Item
                     onClick={() => {
-                      setUser(undefined);
+                      setUser(null);
                       Cookies.remove("user");
                       router.push("/");
                       notifications.show({

@@ -1,7 +1,22 @@
-import { myStore, userAtom } from "@/atoms/auth";
+import { userData } from "@/atoms/auth";
+import { isExpired, refreshToken } from "@/refreshToken";
 
-export default function fetchApi(input: RequestInfo | URL, init?: RequestInit) {
-  const user = myStore.get(userAtom);
+export default async function fetchApi(
+  input: RequestInfo | URL,
+  init?: RequestInit
+) {
+  let user = userData;
+
+  const isExp = isExpired(user?.exp || 0);
+  if (isExp) {
+    const { data, ok } = await refreshToken(
+      user?.refresh_token,
+      user?.exp_refresh || 0
+    );
+    if (ok) {
+      user = data;
+    }
+  }
   const thisInit: RequestInit = { ...init };
 
   let headers = new Headers(init?.headers);

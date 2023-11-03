@@ -4,5 +4,5 @@ import Cookies from "js-cookie";
 
 export const myStore = createStore();
 const data = Cookies.get("user");
-const userData = data ? (JSON.parse(data) as LoginRet) : undefined;
+export const userData = data ? (JSON.parse(data) as LoginRet) : null;
 export const userAtom = atom(userData);

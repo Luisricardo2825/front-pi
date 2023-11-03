@@ -9,15 +9,14 @@ import { Notifications } from "@mantine/notifications";
 import { nprogress, NavigationProgress } from "@mantine/nprogress";
 import type { AppProps } from "next/app";
 import { HeaderMenu } from "@/Component/Header/Header";
-import { useRouter, Router } from "next/router";
+import { Router } from "next/router";
 import Check from "@/utils/CheckPage";
 import { Roboto_Mono } from "next/font/google";
 import { Provider } from "jotai";
 import React from "react";
 import { Footer } from "@/Component/Footer/Footer";
 import { myStore } from "@/atoms/auth";
-import { useIdle } from "@mantine/hooks";
-import refreshToken from "@/utils/refreshToken";
+import { middleware } from "@/refreshToken";
 
 const font = Roboto_Mono({
   subsets: ["latin"],
@@ -31,17 +30,16 @@ Router.events.on("routeChangeComplete", () => nprogress.complete());
 Router.events.on("routeChangeError", () => nprogress.complete());
 
 export default function App({ Component, pageProps, router }: AppProps) {
-  const idle = useIdle(1000, { initialState: false });
-  const Router = useRouter();
-  const isNavbarVisible = Check(Router.pathname, "navbar");
-  const isFooterVisible = Check(Router.pathname, "footer");
+  // const idle = useIdle(1000, { initialState: false });
+
+  const isNavbarVisible = Check(router.pathname, "navbar");
+  const isFooterVisible = Check(router.pathname, "footer");
 
   React.useEffect(() => {
-    if (!idle)
-      refreshToken(router.asPath).then((path) => {
-        if (router.asPath !== path) router.push(path);
-      });
-  }, [router, idle]);
+    middleware(router.pathname).then((path) => {
+      router.push(path);
+    });
+  }, [router, router.pathname]);
   return (
     <Provider store={myStore}>
       <MantineProvider>

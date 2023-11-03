@@ -249,11 +249,14 @@ export const getServerSideProps = (async (context) => {
     if (token) {
       headers.append("Authorization", "Bearer " + token);
     }
-    const data: Content<Carro> = await (
-      await fetchApi(url, {
-        headers: headers,
-      })
-    ).json();
+    const res = await fetchApi(url, {
+      headers: headers,
+    });
+
+    if (!res.ok) {
+      throw new Error(res.statusText);
+    }
+    const data: Content<Carro> = await res.json();
 
     const response: Response = {
       ok: true,

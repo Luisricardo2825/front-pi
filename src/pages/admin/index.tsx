@@ -1,16 +1,9 @@
-import { LoginRet } from "@/@Types/Login";
-import { Content } from "@/@Types/Page";
-import { User } from "@/@Types/User";
 import { ActionsGrid } from "@/Component/admin/actions";
-import fetchApi from "@/utils/fetcher";
 import { Container } from "@mantine/core";
-import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import Head from "next/head";
 import React from "react";
 
-export default function Admin({
-  users,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Admin() {
   return (
     <Container size={"xs"} mt={50}>
       <Head>
@@ -23,20 +16,3 @@ export default function Admin({
     </Container>
   );
 }
-
-export const getServerSideProps = (async (context) => {
-  const { token } = JSON.parse(context.req.cookies["user"] || "{}") as LoginRet;
-  const users: Content<User> = await (
-    await fetchApi("/users", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + token,
-      },
-    })
-  ).json();
-  return {
-    props: { users },
-  };
-}) satisfies GetServerSideProps<{
-  users: Content<User>;
-}>;
