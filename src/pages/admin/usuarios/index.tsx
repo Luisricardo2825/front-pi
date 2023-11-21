@@ -17,9 +17,7 @@ import {
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { IconPlus } from "@tabler/icons-react";
-import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import Head from "next/head";
-import { useRouter } from "next/router";
 import React from "react";
 
 export default function Admin() {

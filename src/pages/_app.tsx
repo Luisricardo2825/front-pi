@@ -36,7 +36,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
   const isFooterVisible = Check(router.pathname, "footer");
 
   React.useEffect(() => {
-    middleware(router.pathname).then((path) => {
+    middleware(router.asPath).then((path) => {
       router.push(path);
     });
   }, [router, router.pathname]);

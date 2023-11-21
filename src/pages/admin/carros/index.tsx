@@ -15,37 +15,32 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useDebouncedState } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 import { IconPlus } from "@tabler/icons-react";
-import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React from "react";
 
-let lastPosition = { x: 0, y: 0 };
-
-export default function Admin({
-  response,
-  marcas,
-  marcasSelecionadas: selected,
-  modelo: mod,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Admin() {
   const router = useRouter();
-  const viewport = React.useRef<HTMLDivElement>(null);
   const input = React.useRef<HTMLInputElement>(null);
-  const [modelo, setModelo] = useDebouncedState<string | undefined>(mod, 200);
-  const [marcasSelecionadas, setMarcasSelecionadas] = React.useState<string[]>(
-    selected.length > 0 ? selected : []
-  );
+  const [data, setData] = React.useState<Content<Carro>>();
+  const [marcas, setMarcas] = React.useState<string[]>();
 
-  const cars: Carro[] = React.useMemo(
-    () => (response?.ok ? response?.content : []),
-    [response]
+  const [page, setPage] = React.useState(1);
+  const [modelo, setModelo] = useDebouncedState<string | undefined>("", 200);
+
+  const [marcasSelecionadas, setMarcasSelecionadas] = React.useState<string[]>(
+    []
   );
 
   React.useEffect(() => {
-    viewport.current!.scrollTo({ top: lastPosition.y, behavior: "instant" });
-    input.current?.focus();
+    getMarcas().then(setMarcas);
   }, []);
+
+  React.useEffect(() => {
+    getCarros({ page, marcasSelecionadas, modelo }).then(setData);
+  }, [marcasSelecionadas, modelo, page]);
 
   return (
     <Grid mt={"xl"}>
@@ -63,25 +58,12 @@ export default function Admin({
             data-focus
             description="Filtro por marcas"
             onChange={(values) => {
+              setPage(1);
               setMarcasSelecionadas(values);
-              router.push(
-                {
-                  pathname: "/admin/carros",
-                  query: { ...router.query, marcas: values, page: 0 },
-                },
-                undefined,
-                { scroll: false }
-              );
             }}
             value={marcasSelecionadas}
           >
-            <ScrollArea
-              h={200}
-              onScrollPositionChange={(position) => {
-                lastPosition = position;
-              }}
-              viewportRef={viewport}
-            >
+            <ScrollArea h={200}>
               {marcas?.map((marca) => {
                 return (
                   <Checkbox
@@ -102,24 +84,9 @@ export default function Admin({
             mt={"sm"}
             defaultValue={modelo}
             ref={input}
-            rightSection={
-              <Button
-                onClick={() => {
-                  router.push(
-                    {
-                      pathname: "/admin/carros",
-                      query: { ...router.query, modelo: modelo },
-                    },
-                    undefined,
-                    { scroll: false }
-                  );
-                }}
-              >
-                Buscar
-              </Button>
-            }
             onChange={(e) => {
               setModelo(e.target.value);
+              setPage(1);
             }}
           />
         </Paper>
@@ -128,14 +95,11 @@ export default function Admin({
         <Container mt={50} size={"xl"}>
           <Flex justify={"space-between"}>
             <Pagination
-              total={response.totalPages}
-              defaultValue={response.page + 1}
+              total={data?.totalPages || 0}
+              value={page}
               size="xs"
               onChange={(page) => {
-                router.push({
-                  pathname: "/admin/carros",
-                  query: { page: page - 1 },
-                });
+                setPage(page);
               }}
             />
             <Button
@@ -151,27 +115,22 @@ export default function Admin({
               Novo
             </Button>
           </Flex>
-          <CarTable data={cars} />
+          <CarTable
+            data={data?.content}
+            onDelete={() => {
+              getCarros({ page, marcasSelecionadas, modelo }).then((data) => {
+                setData(data);
+                if (data?.totalPages && data.totalPages <= page) {
+                  setPage(data.totalPages);
+                }
+              });
+            }}
+          />
         </Container>
       </Grid.Col>
     </Grid>
   );
 }
-
-type Fulfilled = {
-  ok: true;
-  message: string;
-  page: number;
-} & Content<Carro>;
-
-type Rejected = {
-  ok: false;
-  message: string;
-  totalPages: number;
-  page: number;
-};
-
-type Response = Fulfilled | Rejected;
 
 const getMarcas = async () => {
   try {
@@ -182,20 +141,16 @@ const getMarcas = async () => {
     return [];
   }
 };
+interface IGetData {
+  page: number;
+  modelo?: string;
+  marcasSelecionadas?: string[];
+}
 
-export const getServerSideProps = (async (context) => {
-  const { token } = JSON.parse(context.req.cookies["user"] || "{}") as LoginRet;
-  const headers = new Headers();
-
-  let page = context.query.page || 0;
-  page = Math.abs(Number(page));
-
-  let modelo = context.query.modelo;
-  let marcasSelecionadas = context.query.marcas;
-
+const getCarros = async ({ page, marcasSelecionadas, modelo }: IGetData) => {
   const params = new URLSearchParams();
 
-  params.append("page", String(page));
+  params.append("page", String(page - 1));
 
   if (modelo && typeof modelo == "string" && modelo.length > 0) {
     params.append("modelo", modelo);
@@ -218,51 +173,11 @@ export const getServerSideProps = (async (context) => {
 
   const url = "/cars" + "?" + params;
 
-  const marcas = await getMarcas();
   try {
-    headers.append("Content-Type", "application/json");
-    if (token) {
-      headers.append("Authorization", "Bearer " + token);
-    }
-    const data: Content<Carro> = await (
-      await fetchApi(url, {
-        headers: headers,
-      })
-    ).json();
-    const response: Response = {
-      ok: true,
-      message: "",
-      ...data,
-      page: data.number,
-    };
+    const data: Content<Carro> = await (await fetchApi(url)).json();
 
-    return {
-      props: {
-        response,
-        marcas,
-        marcasSelecionadas,
-        modelo,
-      },
-    };
+    return data;
   } catch (error) {
-    const response: Response = {
-      ok: false,
-      message: String(error),
-      totalPages: 0,
-      page: 0,
-    };
-    return {
-      props: {
-        response,
-        marcas,
-        marcasSelecionadas,
-        modelo,
-      },
-    };
+    return undefined;
   }
-}) satisfies GetServerSideProps<{
-  response: Response;
-  marcas: string[];
-  marcasSelecionadas: string[];
-  modelo: string | undefined;
-}>;
+};

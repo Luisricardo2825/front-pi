@@ -52,7 +52,7 @@ export default function Page({
     const raw = JSON.stringify({
       telefone: values.telefone,
       carId: id,
-      nome: values.telefone,
+      nome: values.nome,
     });
 
     const requestOptions: RequestInit = {

@@ -2,11 +2,13 @@ const PagesWithoutNavbar: Array<string> = [
   "/login",
   "/admin/usuarios/register",
   "/recuperar",
+  "/relatorio",
 ];
 const PagesWithoutFooter: Array<string> = [
   "/login",
   "/admin/usuarios/register",
   "/recuperar",
+  "/relatorio",
 ];
 
 const Check = (path: string, type: string) => {

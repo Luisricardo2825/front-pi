@@ -3,67 +3,75 @@ import { useState } from "react";
 import {
   Table,
   ScrollArea,
-  Image,
-  HoverCard,
-  Anchor,
   ActionIcon,
   Flex,
-  Tooltip,
+  Badge,
+  Anchor,
+  Switch,
 } from "@mantine/core";
 import classes from "./TableScrollArea.module.css";
-import { Carro } from "@/@Types/Carro";
-import { BRlFormat, BrDateFormat } from "@/utils/Formatter";
+import { BrDateFormat } from "@/utils/Formatter";
 import { IconAdjustments, IconTrash } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
 import fetchApi from "@/utils/fetcher";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/router";
+import { Interesse } from "@/@Types/Interesse";
 import Link from "next/link";
 
-interface CarTableProps {
-  data?: Carro[];
+interface InterestTableProps {
+  data?: Interesse[];
   onDelete?: (id: number | undefined) => void;
   onEdit?: (id: number | undefined) => void;
+  onSwitch?: (id: number | undefined) => void;
 }
-export function CarTable({ data, onDelete, onEdit }: CarTableProps) {
+export function InterestTable({
+  data,
+  onDelete,
+  onSwitch,
+  onEdit,
+}: InterestTableProps) {
   const [scrolled, setScrolled] = useState(false);
-  const router = useRouter();
   const rows = data?.map((row) => (
     <Table.Tr key={row.id}>
+      <Table.Td>{row.id}</Table.Td>
+      <Table.Td>{row.nome}</Table.Td>
+      <Table.Td>{row.telefone}</Table.Td>
+      <Table.Td>{BrDateFormat.format(new Date(row.dataInteresse))}</Table.Td>
       <Table.Td>
-        <Tooltip label="Exibir">
-          <Anchor
-            component={Link}
-            href={{ pathname: "/carros/[id]", query: { id: row.id } }}
-          >
-            {row.id}
-          </Anchor>
-        </Tooltip>
+        <Switch
+          size="lg"
+          onLabel="Ativo"
+          offLabel="Inativo"
+          defaultChecked={row.ativo}
+          onChange={(e) => {
+            fetchApi(`/interests/${row.id}`, {
+              method: "PUT",
+              body: JSON.stringify({
+                ativo: e.currentTarget.checked,
+              }),
+            }).then(async (res) => {
+              if (!res.ok) {
+                throw await res.json();
+              }
+              notifications.show({
+                message: "Atualizado com sucesso",
+                color: "green",
+              });
+              onSwitch?.(row.id);
+            });
+            return e;
+          }}
+        />
       </Table.Td>
       <Table.Td>
-        <HoverCard
-          shadow="md"
-          position="right"
-          styles={{ dropdown: { border: "none", padding: 0 } }}
+        <Anchor
+          component={Link}
+          href={{ pathname: "/carros/[id]", query: { id: row.carro.id } }}
         >
-          <HoverCard.Target>
-            <Anchor>{row.marca + "-" + row.modelo}</Anchor>
-          </HoverCard.Target>
-          <HoverCard.Dropdown bg={"transparent"}>
-            <Image
-              src={row.image}
-              alt={row.modelo}
-              width={"auto"}
-              height={300}
-            />
-          </HoverCard.Dropdown>
-        </HoverCard>
+          {row.carro.marca + "-" + row.carro.modelo}
+        </Anchor>
       </Table.Td>
-      <Table.Td>{row.marca}</Table.Td>
-      <Table.Td>{row.modelo}</Table.Td>
-      <Table.Td>{BRlFormat.format(row.valor)}</Table.Td>
-      <Table.Td>{BrDateFormat.format(new Date(row.anoModelo))}</Table.Td>
-      <Table.Td>{BrDateFormat.format(new Date(row.anoFabricacao))}</Table.Td>
       <Table.Td>
         <Flex justify={"space-around"} direction={"row"}>
           <ActionIcon>
@@ -81,7 +89,7 @@ export function CarTable({ data, onDelete, onEdit }: CarTableProps) {
                 labels: { confirm: "Deletar", cancel: "Cancelar" },
                 onCancel: () => console.log("Cancelado"),
                 onConfirm: () =>
-                  fetchApi(`/cars/${row.id}`, { method: "DELETE" })
+                  fetchApi(`/interests/${row.id}`, { method: "DELETE" })
                     .then(async (res) => {
                       if (!res.ok) {
                         throw await res.json();
@@ -130,12 +138,11 @@ export function CarTable({ data, onDelete, onEdit }: CarTableProps) {
         >
           <Table.Tr>
             <Table.Th>ID</Table.Th>
-            <Table.Th>Imagem</Table.Th>
-            <Table.Th>Marca</Table.Th>
-            <Table.Th>Modelo</Table.Th>
-            <Table.Th>Valor</Table.Th>
-            <Table.Th>Ano modelo</Table.Th>
-            <Table.Th>Ano Fabricação</Table.Th>
+            <Table.Th>Nome</Table.Th>
+            <Table.Th>Telefone</Table.Th>
+            <Table.Th>Data interesse</Table.Th>
+            <Table.Th>Ativo</Table.Th>
+            <Table.Th>Carro</Table.Th>
             <Table.Th>Ações</Table.Th>
           </Table.Tr>
         </Table.Thead>

@@ -4,9 +4,11 @@ import Head from "next/head";
 import generateVehicles from "@/utils/faker";
 import { useAtomValue } from "jotai";
 import { userAtom } from "@/atoms/auth";
+import React from "react";
 
 export default function Home() {
   const user = useAtomValue(userAtom);
+
   return (
     <>
       <Head>

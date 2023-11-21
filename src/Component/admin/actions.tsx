@@ -7,13 +7,20 @@ import {
   Group,
   useMantineTheme,
 } from "@mantine/core";
-import { IconCar, IconUsers } from "@tabler/icons-react";
+import { IconCar, IconUserExclamation, IconUsers } from "@tabler/icons-react";
 import classes from "./ActionsGrid.module.css";
 import { useRouter } from "next/router";
+import { IconUserHeart } from "@tabler/icons-react";
 
 const mockdata = [
   { title: "Usuários", icon: IconUsers, color: "red", href: "/admin/usuarios" },
   { title: "Carros", icon: IconCar, color: "blue", href: "/admin/carros" },
+  {
+    title: "Interesses",
+    icon: IconUserHeart,
+    color: "grape",
+    href: "/admin/interesses",
+  },
 ];
 
 export function ActionsGrid() {
