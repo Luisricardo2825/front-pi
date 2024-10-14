@@ -20,14 +20,20 @@ export default async function generateVehicles(
   user: LoginRet,
   qtd: number = 10
 ) {
-  const data: Cars = await (
-    await fetch("https://private-anon-8dc67d2bad-carsapi1.apiary-mock.com/cars")
-  ).json();
+  const data: Cars = [...Array(qtd).keys()].map((i) => ({
+    year: faker.number.int({ min: 1990, max: 2022 }),
+    id: i,
+    horsepower: faker.number.int({ min: 50, max: 500 }),
+    make: faker.vehicle.manufacturer(),
+    model: faker.vehicle.model(),
+    price: faker.number.int({ min: 10000, max: 50000 }),
+    img_url: faker.image.urlLoremFlickr({ category: "transport" }),
+  }));
   const cars: Carro[] = [];
 
   data.forEach((car) => {
     cars.push({
-      anoFabricacao: `${car.year}-01-01`,
+      anoFabricacao: `2010-01-01`,
       anoModelo: `${car.year}-01-01`,
       descricao: faker.lorem.lines(),
       image: faker.image.urlLoremFlickr({ category: "transport" }),
@@ -59,5 +65,5 @@ const doPost = (carro: Carro, token: string) => {
     redirect: "follow",
   };
 
-  return fetch(process.env.NEXT_PUBLIC_API_PATH+"/cars", requestOptions);
+  return fetch(process.env.NEXT_PUBLIC_API_PATH + "/cars", requestOptions);
 };
